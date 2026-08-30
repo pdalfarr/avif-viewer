@@ -15,6 +15,7 @@ import com.intellij.util.ui.AsyncProcessIcon
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.GridBagLayout
+import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
@@ -59,7 +60,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
         return toolbar.component
     }
 
-    private fun createAction(text: String, icon: javax.swing.Icon, action: () -> Unit): AnAction {
+    private fun createAction(text: String, icon: Icon, action: () -> Unit): AnAction {
         return object : AnAction(text, text, icon) {
             override fun actionPerformed(e: AnActionEvent) {
                 action()
@@ -153,7 +154,6 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             window.viewerReset = function() {
                                 img.classList.remove('fit-screen');
                                 window.currentScale = 1.0;
-                                window.currentRotation = 0;
                                 applyTransforms();
                             };
 

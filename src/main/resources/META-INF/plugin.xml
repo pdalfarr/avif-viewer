@@ -1,8 +1,8 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>be.dalfarra.avifviewer</id>
-    <name>avif-viewer</name>
-    <vendor>dalfarra</vendor>
+    <name>AVIF Viewer</name>
+    <vendor>Pascal Dal Farra</vendor>
     <description><![CDATA[
         <p><b>AVIF Viewer</b> is an IntelliJ image viewer plugin which support AVIF image format.</p>
     ]]></description>

@@ -45,6 +45,9 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
             add(createAction("Zoom Out", AllIcons.General.Remove) { zoomOut() })
             add(createAction("Actual Size (1:1)", AllIcons.General.ActualZoom) { resetZoom() })
             add(createAction("Fit to Screen", AllIcons.General.FitContent) { fitToScreen() })
+            addSeparator()
+            add(createAction("Rotate Left", AllIcons.Actions.Undo) { rotateLeft() })
+            add(createAction("Rotate Right", AllIcons.Actions.Redo) { rotateRight() })
         }
 
         val toolbar = ActionManager.getInstance().createActionToolbar(
@@ -113,7 +116,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             img {
                                 display: block;
                                 transform-origin: center center;
-                                transition: transform 0.1s ease-out;
+                                transition: transform 0.15s ease-out;
                                 user-select: none;
                             }
                             .fit-screen {
@@ -129,23 +132,35 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                         </div>
                         <script>
                             window.currentScale = 1.0;
+                            window.currentRotation = 0;
                             const img = document.getElementById('avif-img');
+
+                            function applyTransforms() {
+                                img.style.transform = 'scale(' + window.currentScale + ') rotate(' + window.currentRotation + 'deg)';
+                            }
+
+                            window.viewerRotate = function(angleDelta) {
+                                window.currentRotation = (window.currentRotation + angleDelta) % 360;
+                                applyTransforms();
+                            };
 
                             window.viewerZoom = function(delta) {
                                 img.classList.remove('fit-screen');
                                 window.currentScale = Math.max(0.1, Math.min(10.0, window.currentScale + delta));
-                                img.style.transform = 'scale(' + window.currentScale + ')';
+                                applyTransforms();
                             };
 
                             window.viewerReset = function() {
                                 img.classList.remove('fit-screen');
                                 window.currentScale = 1.0;
-                                img.style.transform = 'scale(1)';
+                                window.currentRotation = 0;
+                                applyTransforms();
                             };
 
                             window.viewerFit = function() {
                                 window.currentScale = 1.0;
-                                img.style.transform = 'scale(1)';
+                                window.currentRotation = 0;
+                                applyTransforms();
                                 img.classList.add('fit-screen');
                             };
 
@@ -182,6 +197,8 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
     private fun zoomOut() = executeJS("window.viewerZoom(-0.25);")
     private fun resetZoom() = executeJS("window.viewerReset();")
     private fun fitToScreen() = executeJS("window.viewerFit();")
+    private fun rotateLeft() = executeJS("window.viewerRotate(-90);")
+    private fun rotateRight() = executeJS("window.viewerRotate(90);")
     private fun toggleGrid() = executeJS("window.viewerToggleGrid();")
 
     private fun executeJS(script: String) {

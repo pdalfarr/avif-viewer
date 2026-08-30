@@ -1,4 +1,4 @@
-package com.dalfarra.avifviewer.editor
+package be.dalfarra.avifviewer.editor
 
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorPolicy

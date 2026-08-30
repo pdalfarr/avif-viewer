@@ -31,3 +31,9 @@ dependencies {
 //    implementation("com.github.umjammer:vavi-image-avif:0.0.7")
 }
 
+tasks.named<org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask>("buildPlugin") {
+    // Supprime les espaces et force des tirets pour le fichier ZIP final
+    val cleanName = rootProject.name.map { char -> if (char == ' ') '-' else char }.joinToString("")
+    archiveBaseName.set(cleanName)
+}
+

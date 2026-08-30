@@ -49,7 +49,14 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
 
 Notes:
 
+    # Gradle Sync
+    ./gradlew help --refresh-dependencies  
+    
+    ./gradlew dependencies
+    
     ./gradlew build
+    
     ./gradlew runIde
+    
     ./gradlew buildPlugin
 

@@ -1,6 +1,6 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.dalfarra.avifviewer</id>
+    <id>be.dalfarra.avifviewer</id>
     <name>avif-viewer</name>
     <vendor>dalfarra</vendor>
     <description><![CDATA[
@@ -12,14 +12,12 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.dalfarra.avifviewer.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.dalfarra.avifviewer.startup.MyProjectActivity" />
 
         <fileType name="AVIF"
-                  implementationClass="com.dalfarra.avifviewer.editor.AvifFileType"
+                  implementationClass="be.dalfarra.avifviewer.editor.AvifFileType"
                   extensions="avif;AVIF"/>
 
-        <fileEditorProvider implementation="com.dalfarra.avifviewer.editor.AvifFileEditorProvider"/>
+        <fileEditorProvider implementation="be.dalfarra.avifviewer.editor.AvifFileEditorProvider"/>
 
     </extensions>
 </idea-plugin>

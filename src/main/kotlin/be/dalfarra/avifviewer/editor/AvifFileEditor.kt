@@ -21,10 +21,7 @@ import javax.swing.SwingUtilities
 
 class AvifFileEditor(private val project: Project, private val file: VirtualFile) : UserDataHolderBase(), FileEditor {
 
-    // Gestion de l'affichage global de l'éditeur (Barre d'outils en haut, Contenu au centre)
     private val rootWrapper = JBPanel<JBPanel<*>>(BorderLayout())
-
-    // Gestion du basculement entre l'écran de chargement et le navigateur JCEF
     private val cardLayout = CardLayout()
     private val contentContainer = JBPanel<JBPanel<*>>(cardLayout)
 
@@ -34,60 +31,37 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
     private var browser: JBCefBrowser? = null
 
     init {
-        // 1. On construit la barre d'outils supérieure et on l'ajoute au Nord
         rootWrapper.add(createToolbar(), BorderLayout.NORTH)
-
-        // 2. On prépare la zone de contenu centrale
         setupLoadingScreen()
         rootWrapper.add(contentContainer, BorderLayout.CENTER)
-
-        // 3. Initialisation asynchrone de Chromium
         initializeBrowserAsync()
     }
 
-    /**
-     * Crée une barre d'outils native reprenant le style de l'éditeur d'images d'IntelliJ
-     */
     private fun createToolbar(): JComponent {
         val actionGroup = DefaultActionGroup().apply {
-            // Bouton Grille transparente (style damier)
-            add(createDummyAction("Toggle Grid", AllIcons.Modules.UnmarkWebroot))
-
-            addSeparator() // Ligne de séparation verticale
-
-            // Boutons de contrôle de zoom
-            add(createDummyAction("Zoom In", AllIcons.General.Add))       // Icône "+"
-            add(createDummyAction("Zoom Out", AllIcons.General.Remove))   // Icône "-"
-            add(createDummyAction("Actual Size (1:1)", AllIcons.General.ActualZoom))
-            add(createDummyAction("Fit to Screen", AllIcons.General.FitContent))
-
+            add(createAction("Toggle Grid", AllIcons.Modules.UnmarkWebroot) { toggleGrid() })
             addSeparator()
-
-            // Outil pipette
-            add(createDummyAction("Color Picker", AllIcons.General.ContextHelp))
+            add(createAction("Zoom In", AllIcons.General.Add) { zoomIn() })
+            add(createAction("Zoom Out", AllIcons.General.Remove) { zoomOut() })
+            add(createAction("Actual Size (1:1)", AllIcons.General.ActualZoom) { resetZoom() })
+            add(createAction("Fit to Screen", AllIcons.General.FitContent) { fitToScreen() })
+//            addSeparator()
+//            add(createAction("Color Picker", AllIcons.General.ContextHelp) { /* Pipette implementation */ })
         }
 
-        // On demande à l'ActionManager de transformer notre groupe en une barre d'outils Swing utilisable
         val toolbar = ActionManager.getInstance().createActionToolbar(
             "AvifViewerToolbar",
             actionGroup,
-            true // true = Orientation horizontale
+            true
         )
-
-        // Indique à la barre d'outils sur quel composant elle agit
         toolbar.targetComponent = rootWrapper
         return toolbar.component
     }
 
-    /**
-     * Helper pour générer des actions de boutons rapidement
-     */
-    private fun createDummyAction(text: String, icon: javax.swing.Icon): AnAction {
+    private fun createAction(text: String, icon: javax.swing.Icon, action: () -> Unit): AnAction {
         return object : AnAction(text, text, icon) {
             override fun actionPerformed(e: AnActionEvent) {
-                // Pour le moment, affiche une simple info de clic
-                println("Action cliquée : $text")
-                // TODO: Vous pourrez brancher ici des fonctions executeJavaScript() sur votre 'browser' !
+                action()
             }
         }
     }
@@ -105,13 +79,101 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
         Thread {
             try {
                 val newBrowser = JBCefBrowser()
-                newBrowser.loadURL("file://${file.path}")
+
+                val customHtml = """
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            * { box-sizing: border-box; }
+                            html, body {
+                                margin: 0;
+                                padding: 0;
+                                width: 100%;
+                                height: 100%;
+                                background-color: #0e0e0e;
+                                overflow: auto;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                            }
+                            .checkerboard {
+                                background-image: linear-gradient(45deg, #222 25%, transparent 25%), 
+                                                  linear-gradient(-45deg, #222 25%, transparent 25%), 
+                                                  linear-gradient(45deg, transparent 75%, #222 75%), 
+                                                  linear-gradient(-45deg, transparent 75%, #222 75%);
+                                background-size: 20px 20px;
+                                background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+                            }
+                            #viewport {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                min-width: 100%;
+                                min-height: 100%;
+                            }
+                            img {
+                                display: block;
+                                transform-origin: center center;
+                                transition: transform 0.1s ease-out;
+                                user-select: none;
+                            }
+                            .fit-screen {
+                                max-width: 100vw;
+                                max-height: 100vh;
+                                object-fit: contain;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div id="viewport">
+                            <img id="avif-img" src="file://${file.path}" />
+                        </div>
+                        <script>
+                            window.currentScale = 1.0;
+                            const img = document.getElementById('avif-img');
+
+                            window.viewerZoom = function(delta) {
+                                img.classList.remove('fit-screen');
+                                window.currentScale = Math.max(0.1, Math.min(10.0, window.currentScale + delta));
+                                img.style.transform = 'scale(' + window.currentScale + ')';
+                            };
+
+                            window.viewerReset = function() {
+                                img.classList.remove('fit-screen');
+                                window.currentScale = 1.0;
+                                img.style.transform = 'scale(1)';
+                            };
+
+                            window.viewerFit = function() {
+                                window.currentScale = 1.0;
+                                img.style.transform = 'scale(1)';
+                                img.classList.add('fit-screen');
+                            };
+
+                            window.viewerToggleGrid = function() {
+                                document.body.classList.toggle('checkerboard');
+                            };
+
+                            // Mouse wheel zoom support
+                            window.addEventListener('wheel', (e) => {
+                                if (e.ctrlKey || e.metaKey) {
+                                    e.preventDefault();
+                                    const delta = e.deltaY < 0 ? 0.15 : -0.15;
+                                    window.viewerZoom(delta);
+                                }
+                            }, { passive: false });
+                        </script>
+                    </body>
+                    </html>
+                """.trimIndent()
+
+                newBrowser.loadHTML(customHtml)
 
                 SwingUtilities.invokeLater {
                     browser = newBrowser
                     contentContainer.add(newBrowser.component, BROWSER_CARD)
                     cardLayout.show(contentContainer, BROWSER_CARD)
-
                     contentContainer.revalidate()
                     contentContainer.repaint()
                 }
@@ -125,10 +187,31 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
         }.start()
     }
 
-    // --- MISE À JOUR : On retourne le rootWrapper qui contient désormais la barre d'outils ---
+    // --- ACTIONS ---
+
+    private fun zoomIn() = executeJS("window.viewerZoom(0.25);")
+    private fun zoomOut() = executeJS("window.viewerZoom(-0.25);")
+    private fun resetZoom() = executeJS("window.viewerReset();")
+    private fun fitToScreen() = executeJS("window.viewerFit();")
+    private fun toggleGrid() = executeJS("window.viewerToggleGrid();")
+
+    private fun executeJS(script: String) {
+        val cefBrowser = browser?.cefBrowser ?: return
+        val mainFrame = cefBrowser.mainFrame ?: return
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            mainFrame.executeJavaScript(script, mainFrame.url, 0)
+        } else {
+            SwingUtilities.invokeLater {
+                mainFrame.executeJavaScript(script, mainFrame.url, 0)
+            }
+        }
+    }
+
+    // --- FILE EDITOR LIFECYCLE ---
+
     override fun getComponent(): JComponent = rootWrapper
     override fun getPreferredFocusedComponent(): JComponent = rootWrapper
-
     override fun getFile(): VirtualFile = file
     override fun getName(): String = file.name
     override fun getState(level: FileEditorStateLevel): FileEditorState = FileEditorState.INSTANCE

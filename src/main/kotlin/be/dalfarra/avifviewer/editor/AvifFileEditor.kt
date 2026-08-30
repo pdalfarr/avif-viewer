@@ -125,7 +125,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                     </head>
                     <body>
                         <div id="viewport">
-                            <img id="avif-img" src="file://${file.path}" />
+                            <img id="avif-img" class="fit-screen" src="file://${file.path}" />
                         </div>
                         <script>
                             window.currentScale = 1.0;

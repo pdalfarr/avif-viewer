@@ -4,7 +4,7 @@
     <name>avif-viewer</name>
     <vendor>dalfarra</vendor>
     <description><![CDATA[
-        <p><b>avif-viewer</b> is an IntelliJ plugin that provides an AVIF viewer.</p>
+        <p><b>AVIF Viewer</b> is an IntelliJ image viewer plugin which support AVIF image format.</p>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>

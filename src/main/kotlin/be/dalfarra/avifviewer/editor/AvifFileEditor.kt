@@ -45,8 +45,6 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
             add(createAction("Zoom Out", AllIcons.General.Remove) { zoomOut() })
             add(createAction("Actual Size (1:1)", AllIcons.General.ActualZoom) { resetZoom() })
             add(createAction("Fit to Screen", AllIcons.General.FitContent) { fitToScreen() })
-//            addSeparator()
-//            add(createAction("Color Picker", AllIcons.General.ContextHelp) { /* Pipette implementation */ })
         }
 
         val toolbar = ActionManager.getInstance().createActionToolbar(
@@ -69,7 +67,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
     private fun setupLoadingScreen() {
         val loadingPanel = JBPanel<JBPanel<*>>(GridBagLayout()).apply {
             add(AsyncProcessIcon("AvifLoading"))
-            add(JBLabel("Initialisation du moteur d'image...", SwingConstants.CENTER))
+            add(JBLabel("Loading...", SwingConstants.CENTER))
         }
         contentContainer.add(loadingPanel, LOADING_CARD)
         cardLayout.show(contentContainer, LOADING_CARD)
@@ -154,15 +152,6 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             window.viewerToggleGrid = function() {
                                 document.body.classList.toggle('checkerboard');
                             };
-
-                            // Mouse wheel zoom support
-                            window.addEventListener('wheel', (e) => {
-                                if (e.ctrlKey || e.metaKey) {
-                                    e.preventDefault();
-                                    const delta = e.deltaY < 0 ? 0.15 : -0.15;
-                                    window.viewerZoom(delta);
-                                }
-                            }, { passive: false });
                         </script>
                     </body>
                     </html>
@@ -179,7 +168,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                 }
             } catch (e: Exception) {
                 SwingUtilities.invokeLater {
-                    val errorPanel = JBLabel("Erreur : ${e.localizedMessage}", SwingConstants.CENTER)
+                    val errorPanel = JBLabel("Error : ${e.localizedMessage}", SwingConstants.CENTER)
                     contentContainer.add(errorPanel, "ERROR")
                     cardLayout.show(contentContainer, "ERROR")
                 }

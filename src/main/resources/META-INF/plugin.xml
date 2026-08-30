@@ -1,11 +1,10 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.pdalfarr.avifviewer</id>
+    <id>com.dalfarra.avifviewer</id>
     <name>avif-viewer</name>
-    <vendor>pdalfarr</vendor>
+    <vendor>dalfarra</vendor>
     <description><![CDATA[
-        <p><b>avif-viewer</b> is a repository that provides a pure template to make it easier to create a new plugin project.</p>
-        <p>The main goal of this template is to speed up the setup phase of plugin development for both new and experienced developers by preconfiguring the project scaffold and CI, linking to the proper documentation pages, and keeping everything organized.</p>
+        <p><b>avif-viewer</b> is an IntelliJ plugin that provides an AVIF viewer.</p>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
@@ -13,7 +12,14 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.pdalfarr.avifviewer.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.pdalfarr.avifviewer.startup.MyProjectActivity" />
+        <toolWindow factoryClass="com.dalfarra.avifviewer.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <postStartupActivity implementation="com.dalfarra.avifviewer.startup.MyProjectActivity" />
+
+        <fileType name="AVIF"
+                  implementationClass="com.dalfarra.avifviewer.editor.AvifFileType"
+                  extensions="avif;AVIF"/>
+
+        <fileEditorProvider implementation="com.dalfarra.avifviewer.editor.AvifFileEditorProvider"/>
+
     </extensions>
 </idea-plugin>

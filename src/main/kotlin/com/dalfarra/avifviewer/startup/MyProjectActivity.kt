@@ -1,4 +1,4 @@
-package com.github.pdalfarr.avifviewer.startup
+package com.dalfarra.avifviewer.startup
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project

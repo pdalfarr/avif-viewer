@@ -1,9 +1,9 @@
-package com.github.pdalfarr.avifviewer.services
+package com.dalfarra.avifviewer.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.github.pdalfarr.avifviewer.MyBundle
+import com.dalfarra.avifviewer.MyBundle
 
 @Service(Service.Level.PROJECT)
 class MyProjectService(project: Project) {

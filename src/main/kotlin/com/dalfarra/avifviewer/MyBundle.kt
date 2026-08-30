@@ -1,4 +1,4 @@
-package com.github.pdalfarr.avifviewer
+package com.dalfarra.avifviewer
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls

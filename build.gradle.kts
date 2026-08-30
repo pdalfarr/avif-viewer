@@ -6,6 +6,18 @@ plugins {
     id("org.jetbrains.changelog")
 }
 
+repositories {
+    mavenCentral()
+
+    // Allows Gradle to look for third-party libraries on GitHub
+    maven { url = uri("https://jitpack.io") }
+
+    // Tells the JetBrains plugin where to download the IDE binaries!
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
+
 dependencies {
     testImplementation("junit:junit:4.13.2")
 
@@ -14,4 +26,8 @@ dependencies {
         intellijIdea("2025.2.6.2")
         testFramework(TestFrameworkType.Platform)
     }
+
+    // AVIF lib
+//    implementation("com.github.umjammer:vavi-image-avif:0.0.7")
 }
+

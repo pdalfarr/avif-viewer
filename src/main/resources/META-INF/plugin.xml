@@ -5,9 +5,8 @@
     <vendor>Pascal Dal Farra</vendor>
     <description><![CDATA[
 <p><b>AVIF Viewer</b> is a lightweight, high-performance image viewer for IntelliJ platform IDEs dedicated to viewing AVIF images seamlessly.</p>
-
-<p><img src="https://raw.githubusercontent.com/pdalfarr/avif-viewer/main/docs/preview.png" alt="Viewer Preview" width="600"/></p>
-
+<br/>
+<img src="https://www.deividart.com/wp-content/uploads/2023/02/formato-avif.jpg" alt="Viewer Preview" width="300"/>
 <h3>Key Features</h3>
 <ul>
   <li><b>Dedicated AVIF Support:</b> Native-like rendering for modern high-efficiency AVIF images directly inside your IDE.</li>

@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-  <!-- Full-Bleed AVIF Diamond Logo -->
-  <g>
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="40" viewBox="0 0 90 40">
+  <!-- Clean, Solid White Background -->
+  <rect width="90" height="40" fill="#FFFFFF"/>
+
+  <!-- Logo Group -->
+  <g transform="translate(0, 0)">
     <!-- Yellow Left Polygon -->
     <polygon points="0,20 20,0 20,40" fill="#EEA22A"/>
 
@@ -13,4 +16,7 @@
     <!-- "IF" Text (Right Side - White) -->
     <text x="21" y="24.5" font-family="system-ui, -apple-system, Arial-Black, sans-serif" font-weight="900" font-size="12" fill="#FFFFFF" letter-spacing="-0.5">IF</text>
   </g>
+
+  <!-- New "Viewer" Text (Matches same font, size, and weight) -->
+  <text x="44" y="24.5" font-family="system-ui, -apple-system, Arial-Black, sans-serif" font-weight="900" font-size="12" fill="#0E0E0E">Viewer</text>
 </svg>

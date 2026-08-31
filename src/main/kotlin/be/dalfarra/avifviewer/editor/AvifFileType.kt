@@ -9,8 +9,6 @@ class AvifFileType : FileType {
     override fun getDescription(): String = "AVIF Image File"
     override fun getDefaultExtension(): String = "avif"
 
-    // --- CORRECTIF : Utilise l'icône native et garantie d'IntelliJ pour les images/diagrammes ---
     override fun getIcon(): Icon = AllIcons.FileTypes.Image
-
     override fun isBinary(): Boolean = true
 }

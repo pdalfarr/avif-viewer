@@ -134,9 +134,36 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                         <script>
                             window.currentScale = 1.0;
                             window.currentRotation = 0;
+                            window.isFitMode = true;
                             const img = document.getElementById('avif-img');
+                            const viewport = document.getElementById('viewport');
 
                             function applyTransforms() {
+                                if (window.isFitMode) {
+                                    img.style.transform = 'none';
+                                    
+                                    // Fix negative modulus math for rotateLeft (-90)
+                                    const normalizedAngle = Math.abs(window.currentRotation) % 180;
+                                    const is90or270 = normalizedAngle === 90;
+                        
+                                    const viewWidth = viewport.clientWidth || window.innerWidth;
+                                    const viewHeight = viewport.clientHeight || window.innerHeight;
+                                    const imgWidth = img.naturalWidth || img.width;
+                                    const imgHeight = img.naturalHeight || img.height;
+                        
+                                    if (imgWidth > 0 && imgHeight > 0 && viewWidth > 0 && viewHeight > 0) {
+                                        if (is90or270) {
+                                            const scaleX = viewWidth / imgHeight;
+                                            const scaleY = viewHeight / imgWidth;
+                                            window.currentScale = Math.min(scaleX, scaleY);
+                                        } else {
+                                            const scaleX = viewWidth / imgWidth;
+                                            const scaleY = viewHeight / imgHeight;
+                                            window.currentScale = Math.min(scaleX, scaleY);
+                                        }
+                                    }
+                                }
+                        
                                 img.style.transform = 'scale(' + window.currentScale + ') rotate(' + window.currentRotation + 'deg)';
                             }
 
@@ -146,27 +173,37 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             };
 
                             window.viewerZoom = function(delta) {
-                                img.classList.remove('fit-screen');
+                                window.isFitMode = false;
                                 window.currentScale = Math.max(0.1, Math.min(10.0, window.currentScale + delta));
                                 applyTransforms();
                             };
 
                             window.viewerReset = function() {
-                                img.classList.remove('fit-screen');
+                                window.isFitMode = false;
                                 window.currentScale = 1.0;
                                 applyTransforms();
                             };
 
                             window.viewerFit = function() {
-                                window.currentScale = 1.0;
-                                window.currentRotation = 0;
+                                window.isFitMode = true;
                                 applyTransforms();
-                                img.classList.add('fit-screen');
                             };
 
                             window.viewerToggleGrid = function() {
                                 document.body.classList.toggle('checkerboard');
                             };
+                        
+                            // Trigger transform calculation automatically when container bounds settle
+                            const resizeObserver = new ResizeObserver(() => {
+                                if (window.isFitMode) applyTransforms();
+                            });
+                            resizeObserver.observe(viewport);
+                        
+                            if (img.complete) {
+                                applyTransforms();
+                            } else {
+                                img.addEventListener('load', applyTransforms);
+                            }
                         </script>
                     </body>
                     </html>

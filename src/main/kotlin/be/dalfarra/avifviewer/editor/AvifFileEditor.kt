@@ -96,6 +96,12 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                                 background-color: #0e0e0e;
                                 overflow: hidden;
                             }
+                            /* Completely hide scrollbars across Chromium */
+                            ::-webkit-scrollbar {
+                                display: none;
+                                width: 0px;
+                                height: 0px;
+                            }
                             .checkerboard {
                                 background-image: linear-gradient(45deg, #222 25%, transparent 25%), 
                                                   linear-gradient(-45deg, #222 25%, transparent 25%), 
@@ -110,7 +116,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                                 display: flex;
                                 justify-content: center;
                                 align-items: center;
-                                overflow: auto;
+                                overflow: hidden;
                                 position: relative;
                             }
                             img {
@@ -122,7 +128,8 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             }
                         </style>
                     </head>
-                    <body>
+                    <!-- disable mouse click -->
+                    <body oncontextmenu="return false;">
                         <div id="viewport">
                             <img id="avif-img" src="file://${file.path}" />
                         </div>

@@ -52,11 +52,15 @@ Notes:
     # Gradle Sync
     ./gradlew help --refresh-dependencies  
     
+    # Test download dependencies
     ./gradlew dependencies
     
     ./gradlew build
     
+    # Test plugin
     ./gradlew runIde
+    ./gradlew runIde --no-build-cache
+    ./gradlew runIde --no-build-cache --rerun-tasks
     
     ./gradlew buildPlugin
 

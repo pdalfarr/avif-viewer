@@ -140,6 +140,39 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             const img = document.getElementById('avif-img');
                             const viewport = document.getElementById('viewport');
 
+                            // === KEYBOARD SHORTCUTS LISTENER ===
+                            window.addEventListener('keydown', (e) => {
+                                switch (e.key) {
+                                    case '+':
+                                    case 'ArrowUp':
+                                        e.preventDefault();
+                                        window.viewerZoom(0.20);
+                                        break;
+                                    case '-':
+                                    case 'ArrowDown':
+                                        e.preventDefault();
+                                        window.viewerZoom(-0.20);
+                                        break;
+                                    case '=':
+                                    case '/':
+                                        e.preventDefault();
+                                        window.viewerReset();
+                                        break;
+                                    case '*':
+                                        e.preventDefault();
+                                        window.viewerFit();
+                                        break;
+                                    case 'ArrowLeft':
+                                        e.preventDefault();
+                                        window.viewerRotate(-90);
+                                        break;
+                                    case 'ArrowRight':
+                                        e.preventDefault();
+                                        window.viewerRotate(90);
+                                        break;
+                                }
+                            });
+
                             function getNormalizedAngle() {
                                 let angle = window.currentRotation % 360;
                                 if (angle < 0) angle += 360;
@@ -240,8 +273,8 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
 
     // --- ACTIONS ---
 
-    private fun zoomIn() = executeJS("window.viewerZoom(0.25);")
-    private fun zoomOut() = executeJS("window.viewerZoom(-0.25);")
+    private fun zoomIn() = executeJS("window.viewerZoom(0.20);")
+    private fun zoomOut() = executeJS("window.viewerZoom(-0.20);")
     private fun resetZoom() = executeJS("window.viewerReset();")
     private fun fitToScreen() = executeJS("window.viewerFit();")
     private fun rotateLeft() = executeJS("window.viewerRotate(-90);")

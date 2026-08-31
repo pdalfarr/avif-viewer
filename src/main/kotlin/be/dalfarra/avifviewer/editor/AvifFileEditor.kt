@@ -94,10 +94,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                                 width: 100%;
                                 height: 100%;
                                 background-color: #0e0e0e;
-                                overflow: auto;
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
+                                overflow: hidden;
                             }
                             .checkerboard {
                                 background-image: linear-gradient(45deg, #222 25%, transparent 25%), 
@@ -108,28 +105,26 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                                 background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
                             }
                             #viewport {
+                                width: 100%;
+                                height: 100%;
                                 display: flex;
                                 justify-content: center;
                                 align-items: center;
-                                min-width: 100%;
-                                min-height: 100%;
+                                overflow: auto;
+                                position: relative;
                             }
                             img {
                                 display: block;
                                 transform-origin: center center;
                                 transition: transform 0.15s ease-out;
                                 user-select: none;
-                            }
-                            .fit-screen {
-                                max-width: 100vw;
-                                max-height: 100vh;
-                                object-fit: contain;
+                                flex-shrink: 0;
                             }
                         </style>
                     </head>
                     <body>
                         <div id="viewport">
-                            <img id="avif-img" class="fit-screen" src="file://${file.path}" />
+                            <img id="avif-img" src="file://${file.path}" />
                         </div>
                         <script>
                             window.currentScale = 1.0;
@@ -138,32 +133,36 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             const img = document.getElementById('avif-img');
                             const viewport = document.getElementById('viewport');
 
+                            function getNormalizedAngle() {
+                                let angle = window.currentRotation % 360;
+                                if (angle < 0) angle += 360;
+                                return angle;
+                            }
+
                             function applyTransforms() {
-                                if (window.isFitMode) {
-                                    img.style.transform = 'none';
-                                    
-                                    // Fix negative modulus math for rotateLeft (-90)
-                                    const normalizedAngle = Math.abs(window.currentRotation) % 180;
-                                    const is90or270 = normalizedAngle === 90;
-                        
-                                    const viewWidth = viewport.clientWidth || window.innerWidth;
-                                    const viewHeight = viewport.clientHeight || window.innerHeight;
-                                    const imgWidth = img.naturalWidth || img.width;
-                                    const imgHeight = img.naturalHeight || img.height;
-                        
-                                    if (imgWidth > 0 && imgHeight > 0 && viewWidth > 0 && viewHeight > 0) {
-                                        if (is90or270) {
-                                            const scaleX = viewWidth / imgHeight;
-                                            const scaleY = viewHeight / imgWidth;
-                                            window.currentScale = Math.min(scaleX, scaleY);
-                                        } else {
-                                            const scaleX = viewWidth / imgWidth;
-                                            const scaleY = viewHeight / imgHeight;
-                                            window.currentScale = Math.min(scaleX, scaleY);
-                                        }
-                                    }
+                                const imgW = img.naturalWidth;
+                                const imgH = img.naturalHeight;
+
+                                // Guard against executing math before image dimensions are decoded
+                                if (!imgW || !imgH) return;
+
+                                const rect = viewport.getBoundingClientRect();
+                                const viewW = rect.width;
+                                const viewH = rect.height;
+
+                                if (window.isFitMode && viewW > 0 && viewH > 0) {
+                                    const angle = getNormalizedAngle();
+                                    const is90or270 = (angle === 90 || angle === 270);
+
+                                    const targetW = is90or270 ? imgH : imgW;
+                                    const targetH = is90or270 ? imgW : imgH;
+
+                                    const scaleX = viewW / targetW;
+                                    const scaleY = viewH / targetH;
+
+                                    window.currentScale = Math.min(scaleX, scaleY);
                                 }
-                        
+
                                 img.style.transform = 'scale(' + window.currentScale + ') rotate(' + window.currentRotation + 'deg)';
                             }
 
@@ -192,17 +191,21 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             window.viewerToggleGrid = function() {
                                 document.body.classList.toggle('checkerboard');
                             };
-                        
-                            // Trigger transform calculation automatically when container bounds settle
+
                             const resizeObserver = new ResizeObserver(() => {
                                 if (window.isFitMode) applyTransforms();
                             });
                             resizeObserver.observe(viewport);
-                        
-                            if (img.complete) {
+
+                            // Guarantee image decoding before triggering fit calculation
+                            if (img.complete && img.naturalWidth !== 0) {
                                 applyTransforms();
                             } else {
-                                img.addEventListener('load', applyTransforms);
+                                img.decode().then(() => {
+                                    applyTransforms();
+                                }).catch(() => {
+                                    img.addEventListener('load', applyTransforms);
+                                });
                             }
                         </script>
                     </body>

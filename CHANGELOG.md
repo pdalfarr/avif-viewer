@@ -4,7 +4,7 @@
 
 ## [Unreleased]
 
-## [0.0.3] - 2026-08-31
+## [0.0.3] - 2026-09-01
 ### Added
 - Rotation support (Rotate Left and Rotate Right buttons)
 - Add Keyboard shortcuts
@@ -15,7 +15,7 @@
   - Actual Size: **/** or **=**
   - Fit to Screen: __*__
 
-## [0.0.2] - 2026-08-30
+## [0.0.2] - 2026-08-31
 ### Added
 - Zoom controls (Zoom In, Zoom Out, Actual Size, Fit to Screen buttons)
 

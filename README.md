@@ -1,8 +1,8 @@
 ## AVIF Viewer
 
 ![Build](https://github.com/pdalfarr/avif-viewer/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/33976.svg)](https://plugins.jetbrains.com/plugin/33976)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/33976.svg)](https://plugins.jetbrains.com/plugin/33976)
 
 **AVIF Viewer** is a lightweight, high-performance image viewer for IntelliJ platform IDEs dedicated to viewing AVIF images seamlessly.
 
@@ -42,9 +42,9 @@ This Fancy IntelliJ Platform Plugin is going to be your implementation of the br
 
 - Using JetBrains Marketplace:
 
-  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
+  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/33976) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
 
-  You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
+  You can also download the [latest release](https://plugins.jetbrains.com/plugin/33976/versions) from JetBrains Marketplace and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
   <p/>
 

@@ -164,6 +164,13 @@ jobs:
       - name: Fetch Sources
         uses: actions/checkout@v6
 
+      # Download the ZIP artifact generated during the build job
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-distribution
+          path: ./build/distributions
+
       # Set up the Java environment for the next steps
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -198,4 +205,5 @@ jobs:
           gh release create $VERSION \
             --draft \
             --title $VERSION \
-            --notes-file $RELEASE_NOTE
+            --notes-file $RELEASE_NOTE \
+            ./build/distributions/*.zip

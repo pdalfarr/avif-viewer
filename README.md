@@ -1,8 +1,21 @@
-# avif-viewer
+## AVIF Viewer
 
 ![Build](https://github.com/pdalfarr/avif-viewer/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+
+**AVIF Viewer** is a lightweight, high-performance image viewer for IntelliJ platform IDEs dedicated to viewing AVIF images seamlessly.
+
+<img src="doc/banner.png" alt="banner" width="300">
+
+### Key Features
+
+- **Dedicated AVIF Support:** Native-like rendering for modern high-efficiency AVIF images directly inside your IDE.
+- **Flexible Zoom Controls:** Includes <i>Fit-to-Screen</i>, <i>Actual Size (1:1)</i>, and custom zoom-in/out scaling.
+- **Image Rotation:** Easily rotate images clockwise or counterclockwise in 90° increments.
+- **Transparency Grid:** Toggleable checkerboard background to inspect alpha transparency layers clearly.
+
+## TMP README content From JetBrains Template
 
 ## Template ToDo list
 - [x] Create a new [IntelliJ Platform Plugin Template][template] project.
@@ -24,6 +37,8 @@ This Fancy IntelliJ Platform Plugin is going to be your implementation of the br
 
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "avif-viewer"</kbd> >
   <kbd>Install</kbd>
+  <p/>
+
 
 - Using JetBrains Marketplace:
 
@@ -31,6 +46,8 @@ This Fancy IntelliJ Platform Plugin is going to be your implementation of the br
 
   You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+  <p/>
+
 
 - Manually:
 
@@ -43,33 +60,3 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
 
 [template]: https://github.com/JetBrains/intellij-platform-plugin-template
 [docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
-
-
----
-
-Notes:
-
-    # Gradle Sync
-    ./gradlew help --refresh-dependencies  
-    
-    # Test download dependencies
-    ./gradlew dependencies
-    
-    ./gradlew build
-    
-    # Test plugin
-    ./gradlew runIde
-    ./gradlew runIde --no-build-cache
-    ./gradlew runIde --no-build-cache --rerun-tasks
-    
-    ./gradlew buildPlugin
-
-    ./gradlew test
-
-     #Display log info
-    ./gradlew test --info
-
-    ./gradlew test --tests "be.dalfarra.avifviewer.editor.MyPluginTest"
-    ./gradlew test --tests "*IntegrationTest"
-    ./gradlew test --info
-

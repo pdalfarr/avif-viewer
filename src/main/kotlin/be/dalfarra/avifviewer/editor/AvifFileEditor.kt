@@ -2,25 +2,30 @@ package be.dalfarra.avifviewer.editor
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.fileEditor.FileEditorStateLevel
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.util.ui.AsyncProcessIcon
+import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.GridBagLayout
-import javax.swing.Icon
-import javax.swing.JComponent
-import javax.swing.SwingConstants
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 class AvifFileEditor(private val project: Project, private val file: VirtualFile) : UserDataHolderBase(), FileEditor {
+
+    private val LOG = Logger.getInstance(AvifFileEditor::class.java)
 
     private val rootWrapper = JBPanel<JBPanel<*>>(BorderLayout())
     private val cardLayout = CardLayout()
@@ -40,15 +45,15 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
 
     private fun createToolbar(): JComponent {
         val actionGroup = DefaultActionGroup().apply {
-            add(createAction("Toggle Grid", AllIcons.Modules.UnmarkWebroot) { toggleGrid() })
+            add(createAction("Toggle Grid (g)", AllIcons.Modules.UnmarkWebroot) { toggleGrid() })
             addSeparator()
-            add(createAction("Zoom In", AllIcons.General.Add) { zoomIn() })
-            add(createAction("Zoom Out", AllIcons.General.Remove) { zoomOut() })
-            add(createAction("Actual Size (1:1)", AllIcons.General.ActualZoom) { resetZoom() })
-            add(createAction("Fit to Screen", AllIcons.General.FitContent) { fitToScreen() })
+            add(createAction("Zoom In (↑ or +)", AllIcons.General.Add) { zoomIn() })
+            add(createAction("Zoom Out (↓ or -)", AllIcons.General.Remove) { zoomOut() })
+            add(createAction("Actual Size (/ or =)", AllIcons.General.ActualZoom) { resetZoom() })
+            add(createAction("Fit to Screen (*)", AllIcons.General.FitContent) { fitToScreen() })
             addSeparator()
-            add(createAction("Rotate Left", AllIcons.Actions.Undo) { rotateLeft() })
-            add(createAction("Rotate Right", AllIcons.Actions.Redo) { rotateRight() })
+            add(createAction("Rotate Left (←)", AllIcons.Actions.Undo) { rotateLeft() })
+            add(createAction("Rotate Right (→)", AllIcons.Actions.Redo) { rotateRight() })
         }
 
         val toolbar = ActionManager.getInstance().createActionToolbar(
@@ -77,12 +82,162 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
         cardLayout.show(contentContainer, LOADING_CARD)
     }
 
+    fun createJcefFallbackPanel(): JComponent {
+        // Determine OS-specific key representation
+        val metaKey = if (SystemInfo.isMac) "Cmd" else "Ctrl"
+
+        val uiDslPanel = panel {
+            group("AVIF Viewer Requires JCEF Support") {
+                row {
+                    text(
+                        """
+                        Your current IDE environment does not have <a href='https://plugins.jetbrains.com/docs/intellij/embedded-browser-jcef.html'>JCEF Support</a>.<br/>
+                        <br/>
+                        Follow the steps below to enable functionality:
+                        """.trimIndent()
+                    )
+                }
+
+                // --- STEP 1 ---
+                row {
+                    text("<b>1. Switch to JetBrains Runtime with JCEF</b>")
+                }
+                indent {
+                    row {
+                        text("Press <shortcut>$metaKey + Shift + A</shortcut> to open <b>Find Action</b>.")
+                    }
+                    row {
+                        text("Search for <code>Choose Boot Java Runtime for the IDE</code>.")
+                    }
+                    row {
+                        text("Select a runtime with <b>JCEF support</b> and restart the IDE.")
+                    }
+                    row {
+                        link("Open Boot Java Runtime Chooser") {
+                            val actionManager = ActionManager.getInstance()
+                            /*
+                                                        val action = actionManager.getAction("ChooseBootJavaRuntimeAction")
+                                                            ?: actionManager.getAction("SelectBootJavaRuntimeAction")
+                                                            ?: actionManager.getAction("GotoAction")
+                            */
+                            val action = actionManager.getAction("GotoAction")
+                            action?.let { targetAction ->
+                                val event = AnActionEvent.createEvent(
+                                    targetAction,
+                                    // Create context that carries the active Project and initial text query
+                                    SimpleDataContext.builder()
+                                        .add(CommonDataKeys.PROJECT, project)
+                                        .add(PlatformDataKeys.CONTEXT_COMPONENT, rootWrapper)
+                                        .add(PlatformDataKeys.PREDEFINED_TEXT, "Runtime")
+                                        .build(),
+                                    null,
+                                    ActionPlaces.ACTION_SEARCH,
+                                    ActionUiKind.SEARCH_POPUP,
+                                    null
+                                )
+                                try {
+                                    LOG.info("Dispatching GotoAction event with context keys: ${AvifFileEditor::class.java.simpleName}")
+                                    action.actionPerformed(event)
+                                } catch (e: Exception) {
+                                    LOG.error("Execution failed while invoking GotoAction", e)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // --- STEP 2 ---
+                row {
+                    text("<b>2. Check Registry Settings</b>")
+                }
+                indent {
+                    row {
+                        text("Open <b>Find Action</b> (<shortcut>$metaKey + Shift + A</shortcut>) and type <code>Registry...</code>.")
+                    }
+                    row {
+                        text("Verify that <code>ide.browser.jcef.enabled</code> is checked.")
+                    }
+                    row {
+                        link("Open Registry Settings") {
+                            val actionManager = ActionManager.getInstance()
+                            /*
+                                                        val action = actionManager.getAction("ChooseBootJavaRuntimeAction")
+                                                            ?: actionManager.getAction("SelectBootJavaRuntimeAction")
+                                                            ?: actionManager.getAction("GotoAction")
+                            */
+                            val action = actionManager.getAction("GotoAction")
+                            action?.let { targetAction ->
+                                val event = AnActionEvent.createEvent(
+                                    targetAction,
+                                    // Create context that carries the active Project and initial text query
+                                    SimpleDataContext.builder()
+                                        .add(CommonDataKeys.PROJECT, project)
+                                        .add(PlatformDataKeys.CONTEXT_COMPONENT, rootWrapper)
+                                        .add(PlatformDataKeys.PREDEFINED_TEXT, "Registry")
+                                        .build(),
+                                    null,
+                                    ActionPlaces.ACTION_SEARCH,
+                                    ActionUiKind.SEARCH_POPUP,
+                                    null
+                                )
+                                try {
+                                    LOG.info("Dispatching GotoAction event with context keys: ${AvifFileEditor::class.java.simpleName}")
+                                    action.actionPerformed(event)
+                                } catch (e: Exception) {
+                                    LOG.error("Execution failed while invoking GotoAction", e)
+                                }
+                            }
+                        }
+                    }                }
+
+                // --- STEP 3 ---
+                row {
+                    text("<b>3. Check Environment Variables</b>")
+                }
+                indent {
+                    row {
+                        text(
+                            "Ensure system variables like <code>IDEA_JDK</code> or <code>STUDIO_JDK</code> " +
+                                    "are not overriding the default runtime with a custom non-JCEF JDK."
+                        )
+                    }
+                }
+            }
+        }
+
+        // Wrap in a GridBagLayout panel to center the content perfectly inside the editor area
+        val centeringWrapper = JPanel(GridBagLayout()).apply {
+            border = JBUI.Borders.empty(20)
+            add(uiDslPanel)
+        }
+
+        val rootWrapper = JPanel(BorderLayout()).apply {
+            add(centeringWrapper, BorderLayout.CENTER)
+        }
+
+        return rootWrapper
+    }
+
+
+    private fun showErrorCard() {
+        SwingUtilities.invokeLater {
+            val ERROR_CARD = "ERROR"
+            val fallbackComponent = createJcefFallbackPanel()
+            contentContainer.add(fallbackComponent, ERROR_CARD)
+            cardLayout.show(contentContainer, ERROR_CARD)
+        }
+    }
+
     private fun initializeBrowserAsync() {
+        if (!JBCefApp.isSupported()) {
+            showErrorCard()
+            return
+        }
+
         Thread {
             try {
                 val newBrowser = JBCefBrowser()
-
-                val customHtml = """
+                val avifHtmlViewer = """
                     <!DOCTYPE html>
                     <html>
                     <head>
@@ -143,6 +298,11 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                             // === KEYBOARD SHORTCUTS LISTENER ===
                             window.addEventListener('keydown', (e) => {
                                 switch (e.key) {
+                                    case 'g':
+                                    case 'G':
+                                        e.preventDefault();
+                                        window.viewerToggleGrid();
+                                        break;
                                     case '+':
                                     case 'ArrowUp':
                                         e.preventDefault();
@@ -252,7 +412,7 @@ class AvifFileEditor(private val project: Project, private val file: VirtualFile
                     </html>
                 """.trimIndent()
 
-                newBrowser.loadHTML(customHtml)
+                newBrowser.loadHTML(avifHtmlViewer)
 
                 SwingUtilities.invokeLater {
                     browser = newBrowser

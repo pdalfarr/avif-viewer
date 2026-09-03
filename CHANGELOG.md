@@ -3,6 +3,8 @@
 # AVIF Viewer Changelog
 
 ## [Unreleased]
+### Added
+- Check JCEF availability.
 
 ## [0.0.3] - 2026-09-01
 ### Added

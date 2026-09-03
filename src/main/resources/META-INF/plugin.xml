@@ -5,15 +5,21 @@
     <vendor>Pascal Dal Farra</vendor>
     <description><![CDATA[
 <p><b>AVIF Viewer</b> is a lightweight, high-performance image viewer for IntelliJ platform IDEs dedicated to viewing AVIF images seamlessly.</p>
-<br/>
-<img src="https://www.deividart.com/wp-content/uploads/2023/02/formato-avif.jpg" alt="Viewer Preview" width="300"/>
+<!--
+<img src="https://raw.githubusercontent.com/pdalfarr/avif-viewer/refs/heads/main/doc/banner.png" alt="Viewer Preview" width="300"/>
+-->
 <h3>Key Features</h3>
 <ul>
-  <li><b>Dedicated AVIF Support:</b> Native-like rendering for modern high-efficiency AVIF images directly inside your IDE.</li>
-  <li><b>Flexible Zoom Controls:</b> Includes <i>Fit-to-Screen</i>, <i>Actual Size (1:1)</i>, and custom zoom-in/out scaling.</li>
-  <li><b>Image Rotation:</b> Easily rotate images clockwise or counterclockwise in 90° increments.</li>
-  <li><b>Transparency Grid:</b> Toggleable checkerboard background to inspect alpha transparency layers clearly.</li>
+    <li><b>Dedicated AVIF Support:</b> Native-like rendering for modern high-efficiency AVIF images directly inside your IDE.</li>
+    <li><b>Flexible Zoom Controls:</b> Includes <i>Fit-to-Screen</i>, <i>Actual Size (1:1)</i>, and custom zoom-in/out scaling.</li>
+    <li><b>Image Rotation:</b> Easily rotate images clockwise or counterclockwise in 90° increments.</li>
+    <li><b>Transparency Grid:</b> Toggleable checkerboard background to inspect alpha transparency layers clearly.</li>
 </ul>
+<p>
+    <b>Note:</b><br/>
+    AVIF Viewer requires <b>JCEF (Java Chromium Embedded Framework)</b> support in your IDE's runtime to render images.<br/>
+    For details, see the <a href="https://plugins.jetbrains.com/docs/intellij/embedded-browser-jcef.html">JCEF Documentation</a>.
+</p>
 ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
